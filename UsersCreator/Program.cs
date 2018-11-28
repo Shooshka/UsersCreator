@@ -4,6 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.DirectoryServices.AccountManagement;
+using System.Diagnostics;
+using System.Reflection;
+using System.IO;
+
 
 namespace UsersCreator
 {
@@ -36,6 +40,15 @@ namespace UsersCreator
                 GroupPrincipal group = GroupPrincipal.FindByIdentity(context, "Пользователи");
                 group.Members.Add(user);
                 group.Save();
+
+                string exeDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                Directory.SetCurrentDirectory(exeDir);
+                Process process = new Process();
+                process.StartInfo.FileName = "tscmd.exe";
+                process.StartInfo.Arguments = $"localhost {user} TimeoutDisconnect 1";
+                process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                process.Start();
+                process.WaitForExit();// Waits here for the process to exit.
             }
         }
 
